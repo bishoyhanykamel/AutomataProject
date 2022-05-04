@@ -16,27 +16,28 @@ class Circle(QGraphicsEllipseItem):
     CTRL_RIGHT_X = 45
     CTRL_RIGHT_Y = 13
 
-    def __init__(self):
+    def __init__(self, state):
         QGraphicsEllipseItem.__init__(self)
+        self.state = state
         self.anim = QVariantAnimation()
         self.setRect(QRectF(-10, -10, self.RECT_X, self.RECT_Y))
         pen = QPen(Qt.black)
         pen.setWidth(2)
         self.setPen(pen)
         self.setFlag(self.ItemIsMovable)
-        # self.control_points = []
-        self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self)
-        self.add_control_point(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self)
+        self.control_points = []
+        self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self.state)
+        self.add_control_point(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self.state)
         pass
 
     def add_control_point(self, x, y, parent_state):
         pen = QPen(Qt.red)
         pen.setWidth(2)
-        control_left = ControlPoint(self, True, parent_state)
-        # self.control_points.append(control_left)
-        control_left.setPen(pen)
-        control_left.setX(x)
-        control_left.setY(y)
+        control_point = ControlPoint(self, True, parent_state)
+        control_point.setPen(pen)
+        control_point.setX(x)
+        control_point.setY(y)
+        self.control_points.append(control_point)
         pass
 
 
@@ -94,6 +95,10 @@ class ControlPoint(QGraphicsEllipseItem):
         return False
 
     def itemChange(self, change, value):
-        for line in self.lines:
-            line.update_line(self)
-        return super().itemChange(change, value)
+        try:
+            for line in self.lines:
+                line.update_line(self)
+            return super().itemChange(change, value)
+        except Exception as e:
+            print(e)
+            return

@@ -103,8 +103,8 @@ class EdgeCreationUI(QMainWindow):
 
         print(f'starting control point -> {self.startItem} - parent: {self.startItem.parent_state}')
         print(f'ending control point -> {self.endItem} - parent: {self.endItem.parent_state}')
-        add_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
-                 edge_alphabet)
+        create_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
+                    edge_alphabet)
 
         self.close()
         pass
@@ -138,6 +138,7 @@ class StateEditUI(QMainWindow):
         self.show()
 
     def delete_state(self):
+        remove_state(window.drawing_scene, self.state_to_edit, window.selectState_comboBox)
         self.close()
 
     def close_window(self):
@@ -170,6 +171,7 @@ class EdgeEditUI(QMainWindow):
         self.show()
 
     def delete_edge(self):
+        remove_edge(window.drawing_scene, self.edge_to_edit, window.selectEdge_comboBox)
         self.close()
 
     def close_window(self):
@@ -208,14 +210,14 @@ class MainWindowUI(QMainWindow):
     def edit_state_window(self):
         # if condition to check selection of combobox
         # state = self.selectState_comboBox.
-        self.edit_state_ui = StateEditUI('test state')
+        selected_state = get_selected_state(self.selectState_comboBox)
+        self.edit_state_ui = StateEditUI(selected_state)
         self.setEnabled(False)
         pass
 
     def edit_edge_window(self):
-        # if condition to check selection of combobox
-        # state = self.selectState_comboBox.
-        self.edit_edge_ui = EdgeEditUI('test edge')
+        selected_edge = get_selected_edge(self.selectEdge_comboBox)
+        self.edit_edge_ui = EdgeEditUI(selected_edge)
         self.setEnabled(False)
         pass
 
