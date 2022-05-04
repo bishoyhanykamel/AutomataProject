@@ -20,12 +20,12 @@ class State:
 class Edge:
     EDGES = []
 
-    def __init__(self, number, from_parent, to_parent, line_item, inp):
+    def __init__(self, number, from_parent, to_parent, line_item, input):
         self.number = number
         self.from_parent = from_parent
         self.to_parent = to_parent
         self.line_item = line_item
-        self.alphabet = inp
+        self.alphabet = input
         self.combobox_id = number
         Edge.EDGES.append(self)
 
