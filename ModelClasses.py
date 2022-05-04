@@ -1,11 +1,9 @@
-from PyQt5 import Qt
+#from PyQt5 import Qt
 # drawing elements
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsItem
 from PyQt5.QtCore import QRectF, QPoint, QLineF, QVariantAnimation, Qt
 from PyQt5.QtGui import QPainterPath
 from controller import *
-
-
 
 
 class Circle(QGraphicsEllipseItem):
@@ -26,16 +24,16 @@ class Circle(QGraphicsEllipseItem):
         pen.setWidth(2)
         self.setPen(pen)
         self.setFlag(self.ItemIsMovable)
-        #self.control_points = []
-        self.addControlPoint(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self)
-        self.addControlPoint(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self)
+        # self.control_points = []
+        self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self)
+        self.add_control_point(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self)
         pass
 
-    def addControlPoint(self, x, y, parentState):
+    def add_control_point(self, x, y, parent_state):
         pen = QPen(Qt.red)
         pen.setWidth(2)
-        control_left = ControlPoint(self, True, parentState)
-        #self.control_points.append(control_left)
+        control_left = ControlPoint(self, True, parent_state)
+        # self.control_points.append(control_left)
         control_left.setPen(pen)
         control_left.setX(x)
         control_left.setY(y)
@@ -50,22 +48,22 @@ class Connection(QGraphicsLineItem):
         self._line = QLineF(start.scenePos(), p2)
         self.setLine(self._line)
 
-    def controlPoints(self):
+    def control_points(self):
         return self.start, self.end
 
-    def setP2(self, p2):
+    def set_p2(self, p2):
         self._line.setP2(p2)
         self.setLine(self._line)
 
-    def setStart(self, start):
+    def set_start(self, start):
         self.start = start
-        self.updateLine()
+        self.update_line()
 
-    def setEnd(self, end):
+    def set_end(self, end):
         self.end = end
-        self.updateLine(end)
+        self.update_line(end)
 
-    def updateLine(self, source):
+    def update_line(self, source):
         if source == self.start:
             self._line.setP1(source.scenePos())
         else:
@@ -73,23 +71,23 @@ class Connection(QGraphicsLineItem):
         self.setLine(self._line)
 
 
-
 class ControlPoint(QGraphicsEllipseItem):
     COUNTER = 0
-    def __init__(self, parent, onLeft, parentState):
+
+    def __init__(self, parent, on_left, parent_state):
         super().__init__(-5, -5, 10, 10, parent)
-        self.onLeft = onLeft
+        self.onLeft = on_left
         self.lines = []
         self.setFlags(self.ItemSendsScenePositionChanges)
-        self.parentState = parentState
+        self.parent_state = parent_state
 
-    def addLine(self, lineItem):
-        self.lines.append(lineItem)
+    def add_line(self, line_item):
+        self.lines.append(line_item)
         return True
 
-    def removeLine(self, lineItem):
+    def remove_line(self, line_item):
         for existing in self.lines:
-            if existing.controlPoints() == lineItem.controlPoints():
+            if existing.control_points() == line_item.control_points():
                 self.scene().removeItem(existing)
                 self.lines.remove(existing)
                 return True
@@ -97,5 +95,5 @@ class ControlPoint(QGraphicsEllipseItem):
 
     def itemChange(self, change, value):
         for line in self.lines:
-            line.updateLine(self)
+            line.update_line(self)
         return super().itemChange(change, value)

@@ -12,7 +12,7 @@ class GraphicScene(QGraphicsScene):
     START_X = 10
     START_Y = 10
 
-    startItem = newConnection = None
+    start_item = new_connection = None
 
     def __init__(self, graphicsView):
         QGraphicsScene.__init__(self)
@@ -21,7 +21,7 @@ class GraphicScene(QGraphicsScene):
         self.setSceneRect(0, 0, self.WIDTH, self.HEIGHT)
         pass
 
-    def controlPointAt(self, pos):
+    def control_point_at(self, pos):
         mask = QPainterPath()
         mask.setFillRule(Qt.WindingFill)
         for item in self.items(pos):
@@ -34,40 +34,40 @@ class GraphicScene(QGraphicsScene):
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            item = self.controlPointAt(event.scenePos())
+            item = self.control_point_at(event.scenePos())
             if item:
-                self.startItem = item
-                self.newConnection = Connection(item, event.scenePos())
-                self.addItem(self.newConnection)
+                self.start_item = item
+                self.new_connection = Connection(item, event.scenePos())
+                self.addItem(self.new_connection)
                 return
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
-        if self.newConnection:
-            item = self.controlPointAt(event.scenePos())
-            if (item and item != self.startItem and
-                    self.startItem.onLeft != item.onLeft):
+        if self.new_connection:
+            item = self.control_point_at(event.scenePos())
+            if (item and item != self.start_item and
+                    self.start_item.onLeft != item.onLeft):
                 p2 = item.scenePos()
             else:
                 p2 = event.scenePos()
-            self.newConnection.setP2(p2)
+            self.new_connection.set_p2(p2)
             return
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        if self.newConnection:
-            item = self.controlPointAt(event.scenePos())
-            if item and item != self.startItem:
-                self.newConnection.setEnd(item)
-                if self.startItem.addLine(self.newConnection):
-                    item.addLine(self.newConnection)
-                    window.createEdgeCreationWindow(self.startItem, item, self.newConnection)
+        if self.new_connection:
+            item = self.control_point_at(event.scenePos())
+            if item and item != self.start_item:
+                self.new_connection.set_end(item)
+                if self.start_item.add_line(self.new_connection):
+                    item.add_line(self.new_connection)
+                    window.create_edge_creation_window(self.start_item, item, self.new_connection)
                 else:
-                    self.startItem.removeLine(self.newConnection)
-                    self.removeItem(self.newConnection)
+                    self.start_item.remove_line(self.new_connection)
+                    self.removeItem(self.new_connection)
             else:
-                self.removeItem(self.newConnection)
-        self.startItem = self.newConnection = None
+                self.removeItem(self.new_connection)
+        self.start_item = self.new_connection = None
         super().mouseReleaseEvent(event)
 
 
@@ -87,23 +87,30 @@ class EdgeCreationUI(QMainWindow):
         self.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.edge_dialog.setGeometry(0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.cancelEdge_pushButton.clicked.connect(lambda: self.cancelEdge())
-        self.saveEdge_pushButton.clicked.connect(lambda: self.saveEdge())
+        self.cancelEdge_pushButton.clicked.connect(lambda: self.cancel_edge())
+        self.saveEdge_pushButton.clicked.connect(lambda: self.save_edge())
         self.show()
 
-    def saveEdge(self):
-        print(f'starting control point -> {self.startItem} - parent: {self.startItem.parentState}')
-        print(f'ending control point -> {self.endItem} - parent: {self.endItem.parentState}')
+    def save_edge(self):
         edge_alphabet = self.inputEdge_lineEdit.text()
-        # check if user enters no text
-        add_edge(window.selectEdge_comboBox, self.startItem.parentState, self.endItem.parentState, self.line,
+        try:
+            if len(edge_alphabet) <= 0:
+                self.cancel_edge()
+                return
+        except:
+            self.cancel_edge()
+            return
+
+        print(f'starting control point -> {self.startItem} - parent: {self.startItem.parent_state}')
+        print(f'ending control point -> {self.endItem} - parent: {self.endItem.parent_state}')
+        add_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
                  edge_alphabet)
 
         self.close()
         pass
 
-    def cancelEdge(self):
-        self.startItem.removeLine(self.line)
+    def cancel_edge(self):
+        self.startItem.remove_line(self.line)
         self.close()
 
     def closeEvent(self, event):
@@ -122,19 +129,50 @@ class StateEditUI(QMainWindow):
         self.title = self.TITLE
         self.state_to_edit = state
         self.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
-        self.stateEdit_dialog.setGeometry(0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
-        self.cancel_btn.clicked.connect(lambda: self.closeWindow())
-        self.save_btn.clicked.connect(lambda: self.saveState())
+        self.stateEdit_dialog.setGeometry(0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        # buttons
+        self.cancel_btn.clicked.connect(lambda: self.close_window())
+        self.save_btn.clicked.connect(lambda: self.save_state())
+        self.delete_btn.clicked.connect(lambda: self.delete_state())
         self.show()
 
-    def deleteState(self):
+    def delete_state(self):
         self.close()
 
-    def closeWindow(self):
+    def close_window(self):
         self.close()
 
-    def saveState(self):
+    def save_state(self):
+        self.close()
+
+    def closeEvent(self, event):
+        window.setEnabled(True)
+
+
+class EdgeEditUI(QMainWindow):
+    WINDOW_WIDTH = 360
+    WINDOW_HEIGHT = 295
+    UI_FILENAME = 'select_edge_box'
+    TITLE = 'Edit edge'
+
+    def __init__(self, edge):
+        super(EdgeEditUI, self).__init__()
+        uic.loadUi(f'ui/{self.UI_FILENAME}.ui', self)
+        self.title = self.TITLE
+        self.edge_to_edit = edge
+        self.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.edgeEdit_dialog.setGeometry(0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
+        # buttons
+        self.cancel_btn.clicked.connect(lambda: self.close_window())
+        self.delete_btn.clicked.connect(lambda: self.delete_edge())
+        self.show()
+
+    def delete_edge(self):
+        self.close()
+
+    def close_window(self):
         self.close()
 
     def closeEvent(self, event):
@@ -149,32 +187,36 @@ class MainWindowUI(QMainWindow):
         super(MainWindowUI, self).__init__()
         uic.loadUi('ui/final2.ui', self)
         self.setFixedSize(self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
-        self.title = "NFA to DFA Converter"
+        self.title = 'NFA to DFA Converter'
         self.centralwidget.setGeometry(0, 0, self.WINDOW_WIDTH, self.WINDOW_HEIGHT)
 
         drawing_scene = GraphicScene(self.drawing_graphicsView)
         self.drawing_scene = drawing_scene
         self.drawing_graphicsView.setScene(drawing_scene)
         self.addState_btn.clicked.connect(lambda: create_state(drawing_scene, self.selectState_comboBox))
-        self.editState_btn.clicked.connect(self.editStateWindow)
-        self.editEdge_btn.clicked.connect(self.editEdgeWindow)
-        self.createEdgeUI = None
-        self.editStateUI = None
-        self.editEdgeUI = None
+        self.editState_btn.clicked.connect(self.edit_state_window)
+        self.editEdge_btn.clicked.connect(self.edit_edge_window)
+        self.create_edge_ui = None
+        self.edit_state_ui = None
+        self.edit_edge_ui = None
         self.show()
 
-    def createEdgeCreationWindow(self, startItem, endItem, line):
-        self.createEdgeUI = EdgeCreationUI(startItem, endItem, line)
+    def create_edge_creation_window(self, start_item, end_item, line):
+        self.create_edge_ui = EdgeCreationUI(start_item, end_item, line)
         self.setEnabled(False)
 
-    def editStateWindow(self):
+    def edit_state_window(self):
         # if condition to check selection of combobox
         # state = self.selectState_comboBox.
-        self.editStateUI = StateEditUI('test state')
+        self.edit_state_ui = StateEditUI('test state')
         self.setEnabled(False)
         pass
 
-    def editEdgeWindow(self):
+    def edit_edge_window(self):
+        # if condition to check selection of combobox
+        # state = self.selectState_comboBox.
+        self.edit_edge_ui = EdgeEditUI('test edge')
+        self.setEnabled(False)
         pass
 
 
