@@ -81,7 +81,7 @@ font-weight: bold;</string>
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QLabel" name="label_9">
+        <widget class="QLabel" name="name_qTextLabel">
          <property name="styleSheet">
           <string notr="true">font-family: Arial;
 font-size: 14px;
@@ -105,7 +105,7 @@ font-weight: bold;</string>
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QLabel" name="label_11">
+        <widget class="QLabel" name="connected_qTextLabel">
          <property name="styleSheet">
           <string notr="true">font-family: Arial;
 font-size: 14px;
@@ -129,7 +129,7 @@ font-weight: bold;</string>
         </widget>
        </item>
        <item row="2" column="1">
-        <widget class="QRadioButton" name="radioButton">
+        <widget class="QRadioButton" name="final_radioButton">
          <property name="text">
           <string/>
          </property>

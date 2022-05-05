@@ -39,7 +39,7 @@ def get_selected_state(combo_box):
 
 def remove_state(graphic_scene, state, state_combo_box):
     graphic_scene.removeItem(state.circle)
-    #sip.delete(state.circle)
+    # sip.delete(state.circle)
     state_combo_box.removeItem(state.get_number())
     state.delete_state()
     state_combo_box.clear()
@@ -56,7 +56,7 @@ def get_selected_edge(combo_box):
 
 def remove_edge(graphic_scene, edge, edge_combo_box):
     graphic_scene.removeItem(edge.get_line_item())
-    #sip.delete(edge.get_line_item())
+    # sip.delete(edge.get_line_item())
     edge_combo_box.removeItem(edge.get_number())
     edge.delete_edge()
     edge_combo_box.clear()
@@ -64,7 +64,17 @@ def remove_edge(graphic_scene, edge, edge_combo_box):
         edge_combo_box.addItem(edge.get_name())
 
 
-def make_final_state(state, graphic_scene):
+def create_label_for_edge(alphabet, edge):
+    pass
+
+
+def make_final_state(state, final = True):
+    if final:
+        state.circle.make_final()
+        state.set_final(True)
+    else:
+        state.circle.make_not_final()
+        state.set_final(False)
     pass
 
 

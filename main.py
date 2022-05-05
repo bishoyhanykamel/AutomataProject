@@ -135,6 +135,10 @@ class StateEditUI(QMainWindow):
         self.cancel_btn.clicked.connect(lambda: self.close_window())
         self.save_btn.clicked.connect(lambda: self.save_state())
         self.delete_btn.clicked.connect(lambda: self.delete_state())
+        # labels
+        self.name_qTextLabel.setText(self.state_to_edit.get_name())
+        self.connected_qTextLabel.setText('None')
+        self.final_radioButton.setChecked(self.state_to_edit.is_final())
         self.show()
 
     def delete_state(self):
@@ -145,6 +149,7 @@ class StateEditUI(QMainWindow):
         self.close()
 
     def save_state(self):
+        make_final_state(self.state_to_edit, self.final_radioButton.isChecked())
         self.close()
 
     def closeEvent(self, event):

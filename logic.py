@@ -6,6 +6,7 @@ class State:
         self.edges = list()
         self.circle = None
         self.combobox_id = number
+        self.final = False
         self.name = f'State #{self.number}'
         State.STATES.append(self)
         pass
@@ -25,12 +26,19 @@ class State:
     def connect_circle(self, circle):
         self.circle = circle
 
+    def is_final(self):
+        return self.final
+
+    def set_final(self, val):
+        self.final = val
+
     def delete_state(self):
         self.number = None
         self.edges = None
         self.circle = None
         self.combobox_id = None
         self.name = None
+        self.final = False
         State.STATES.remove(self)
         pass
 

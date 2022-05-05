@@ -21,9 +21,7 @@ class Circle(QGraphicsEllipseItem):
         self.state = state
         self.anim = QVariantAnimation()
         self.setRect(QRectF(-10, -10, self.RECT_X, self.RECT_Y))
-        pen = QPen(Qt.black)
-        pen.setWidth(2)
-        self.setPen(pen)
+        self.make_not_final()
         self.setFlag(self.ItemIsMovable)
         self.control_points = []
         self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self.state)
@@ -38,6 +36,18 @@ class Circle(QGraphicsEllipseItem):
         control_point.setX(x)
         control_point.setY(y)
         self.control_points.append(control_point)
+        pass
+
+    def make_final(self):
+        pen = QPen(Qt.black)
+        pen.setWidth(5)
+        self.setPen(pen)
+        pass
+
+    def make_not_final(self):
+        pen = QPen(Qt.black)
+        pen.setWidth(2)
+        self.setPen(pen)
         pass
 
 
