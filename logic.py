@@ -56,6 +56,7 @@ class Edge:
         self.line_item = line_item
         self.alphabet = inp
         self.combobox_id = number
+        self.label_item = None
         Edge.EDGES.append(self)
 
     def delete_edge(self):
@@ -65,6 +66,7 @@ class Edge:
         self.line_item = None
         self.alphabet = None
         self.combobox_id = None
+        self.label_item = None
         Edge.EDGES.remove(self)
         pass
 
@@ -74,8 +76,23 @@ class Edge:
     def get_name(self):
         return f'{self}'
 
+    def get_parent_name(self):
+        return self.from_parent.get_name()
+
+    def get_child_name(self):
+        return self.to_parent.get_name()
+
+    def get_alphabet(self):
+        return self.alphabet
+
     def get_line_item(self):
         return self.line_item
+
+    def get_label_item(self):
+        return self.label_item
+
+    def set_label_item(self, label):
+        self.label_item = label
 
     def __str__(self):
         # return f'Edge status: connected from {self.from_parent} to {self.to_parent} by {self.alphabet}'

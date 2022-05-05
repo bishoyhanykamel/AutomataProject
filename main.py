@@ -67,6 +67,7 @@ class GraphicScene(QGraphicsScene):
                     self.removeItem(self.new_connection)
             else:
                 self.removeItem(self.new_connection)
+
         self.start_item = self.new_connection = None
         super().mouseReleaseEvent(event)
 
@@ -101,10 +102,10 @@ class EdgeCreationUI(QMainWindow):
             self.cancel_edge()
             return
 
-        print(f'starting control point -> {self.startItem} - parent: {self.startItem.parent_state}')
-        print(f'ending control point -> {self.endItem} - parent: {self.endItem.parent_state}')
+        print(f'starting control point -> {self.startItem} - parent: {self.startItem.parent_state.get_name()}')
+        print(f'ending control point -> {self.endItem} - parent: {self.endItem.parent_state.get_name()}')
         create_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
-                    edge_alphabet)
+                    edge_alphabet, window.drawing_scene)
 
         self.close()
         pass
@@ -137,7 +138,6 @@ class StateEditUI(QMainWindow):
         self.delete_btn.clicked.connect(lambda: self.delete_state())
         # labels
         self.name_qTextLabel.setText(self.state_to_edit.get_name())
-        self.connected_qTextLabel.setText('None')
         self.final_radioButton.setChecked(self.state_to_edit.is_final())
         self.show()
 
@@ -173,6 +173,9 @@ class EdgeEditUI(QMainWindow):
         # buttons
         self.cancel_btn.clicked.connect(lambda: self.close_window())
         self.delete_btn.clicked.connect(lambda: self.delete_edge())
+        self.startState_qLabel.setText(self.edge_to_edit.get_parent_name())
+        self.endState_qLabel.setText(self.edge_to_edit.get_child_name())
+        self.input_qLabel.setText(self.edge_to_edit.get_alphabet())
         self.show()
 
     def delete_edge(self):
@@ -213,15 +216,17 @@ class MainWindowUI(QMainWindow):
         self.setEnabled(False)
 
     def edit_state_window(self):
-        # if condition to check selection of combobox
-        # state = self.selectState_comboBox.
         selected_state = get_selected_state(self.selectState_comboBox)
+        if selected_state is None:
+            return
         self.edit_state_ui = StateEditUI(selected_state)
         self.setEnabled(False)
         pass
 
     def edit_edge_window(self):
         selected_edge = get_selected_edge(self.selectEdge_comboBox)
+        if selected_edge is None:
+            return
         self.edit_edge_ui = EdgeEditUI(selected_edge)
         self.setEnabled(False)
         pass

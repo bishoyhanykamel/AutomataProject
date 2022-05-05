@@ -2,7 +2,7 @@
 from PyQt5 import sip
 from PyQt5.QtGui import QPen
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent
+from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
 # project files
 from DrawingClasses import *
 from logic import *
@@ -23,11 +23,12 @@ def create_state(graphic_scene, state_combo_box):
 
 
 # add alphabet parameter
-def create_edge(edge_combo_box, start_state, end_state, line_item, inp='a'):
+def create_edge(edge_combo_box, start_state, end_state, line_item, alphabet, graphic_scene):
     global NUM_EDGES
     NUM_EDGES = NUM_EDGES + 1
-    edge = Edge(NUM_EDGES, start_state, end_state, line_item, inp)
+    edge = Edge(NUM_EDGES, start_state, end_state, line_item, alphabet)
     edge_combo_box.addItem(f'{edge}')
+    create_label_for_edge(alphabet, line_item, edge, graphic_scene)
 
 
 def get_selected_state(combo_box):
@@ -64,11 +65,26 @@ def remove_edge(graphic_scene, edge, edge_combo_box):
         edge_combo_box.addItem(edge.get_name())
 
 
-def create_label_for_edge(alphabet, edge):
+def create_label_for_edge(alphabet, line, edge, graphic_scene):
+    label = EdgeLabel(alphabet, edge)
+    label.set_graphics_scene(graphic_scene)
+    label.show_label()
+    line.set_label_item(label)
     pass
 
 
-def make_final_state(state, final = True):
+def delete_label_for_edge(edge):
+    edge.get_label_item().destroy_label()
+    pass
+
+
+def update_label_for_edge(edge, graphic_scene):
+    delete_label_for_edge(edge)
+    create_label_for_edge(edge.get_alphabet(), edge, graphic_scene)
+    pass
+
+
+def make_final_state(state, final=True):
     if final:
         state.circle.make_final()
         state.set_final(True)
