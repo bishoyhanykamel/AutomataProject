@@ -145,17 +145,17 @@ class ControlPoint(QGraphicsEllipseItem):
             return
 
 
-class EdgeLabel(QGraphicsTextItem):
+class Label(QGraphicsTextItem):
     GRAPHICS_SCENE = None
 
-    def __init__(self, alphabet, edge):
+    def __init__(self, alphabet, item):
         super().__init__()
-        self.edge = edge
+        self.item = item
         self.setEnabled(True)
         self.setDefaultTextColor(Qt.black)
         self.setPlainText(alphabet)
-        self.update_label_position()
-        self.edge.set_label_item(self)
+
+        self.item.set_label_item(self)
         pass
 
     def set_graphics_scene(self, graphics_scene):
@@ -169,9 +169,27 @@ class EdgeLabel(QGraphicsTextItem):
 
     def destroy_label(self):
         self.hide_label()
-        self.edge.set_label_item(None)
+        self.item.set_label_item(None)
         del self
 
+
+class EdgeLabel(Label):
+    def __init__(self, alphabet, item):
+        super().__init__(alphabet, item)
+        self.update_label_position()
+        pass
+
     def update_label_position(self):
-        self.setX(self.edge.get_line_item().get_mid_x())
-        self.setY(self.edge.get_line_item().get_mid_y())
+        self.setX(self.item.get_line_item().get_mid_x())
+        self.setY(self.item.get_line_item().get_mid_y())
+
+
+class StateLabel(Label):
+    def __init__(self, alphabet, item):
+        super().__init__(alphabet, item)
+        self.update_label_position()
+        pass
+
+    def update_label_position(self):
+        self.setX(self.item.get_circle().x())
+        self.setY(self.item.get_circle().y())

@@ -40,6 +40,7 @@ class GraphicScene(QGraphicsScene):
                 self.new_connection = Connection(item, event.scenePos())
                 self.addItem(self.new_connection)
                 return
+
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
@@ -52,6 +53,7 @@ class GraphicScene(QGraphicsScene):
                 p2 = event.scenePos()
             self.new_connection.set_p2(p2)
             return
+        update_label_for_states(self)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
@@ -160,7 +162,7 @@ class EdgeEditUI(QMainWindow):
     WINDOW_WIDTH = 360
     WINDOW_HEIGHT = 295
     UI_FILENAME = 'select_edge_box'
-    TITLE = 'Edit edge'
+    TITLE = 'Edit item'
 
     def __init__(self, edge):
         super(EdgeEditUI, self).__init__()

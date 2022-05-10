@@ -7,6 +7,7 @@ class State:
         self.circle = None
         self.combobox_id = number
         self.final = False
+        self.label_item = False
         self.name = f'State #{self.number}'
         State.STATES.append(self)
         pass
@@ -20,17 +21,26 @@ class State:
     def get_edges(self):
         return self.edges
 
+    def get_label_item(self):
+        return self.label_item
+
+    def get_circle(self):
+        return self.circle
+
     def add_edge(self, edge):
         self.edges.append(edge)
 
     def connect_circle(self, circle):
         self.circle = circle
 
-    def is_final(self):
-        return self.final
-
     def set_final(self, val):
         self.final = val
+
+    def set_label_item(self, label):
+        self.label_item = label
+
+    def is_final(self):
+        return self.final
 
     def delete_state(self):
         self.number = None
@@ -39,6 +49,7 @@ class State:
         self.combobox_id = None
         self.name = None
         self.final = False
+        self.label_item = None
         State.STATES.remove(self)
         pass
 

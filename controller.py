@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
 # project files
 from DrawingClasses import *
+from DrawingClasses import EdgeLabel
 from logic import *
 
 # global variables
@@ -20,6 +21,7 @@ def create_state(graphic_scene, state_combo_box):
     graphic_scene.addItem(circle)
     new_state.connect_circle(circle)
     state_combo_box.addItem(f'{new_state}')
+    create_label_for_state(new_state, graphic_scene)
 
 
 # add alphabet parameter
@@ -38,8 +40,16 @@ def get_selected_state(combo_box):
         print(f'No state found by name: {state.get_name()}')
 
 
+def get_selected_edge(combo_box):
+    for ed in Edge.EDGES:
+        if f'{ed.get_name()}' == f'{combo_box.currentText()}':
+            return ed
+        print(f'No edge found by name: {ed.get_name()}')
+
+
 def remove_state(graphic_scene, state, state_combo_box):
     graphic_scene.removeItem(state.circle)
+    graphic_scene.removeItem(state.get_label_item())
     # sip.delete(state.circle)
     state_combo_box.removeItem(state.get_number())
     state.delete_state()
@@ -48,16 +58,10 @@ def remove_state(graphic_scene, state, state_combo_box):
         state_combo_box.addItem(state.get_name())
 
 
-def get_selected_edge(combo_box):
-    for ed in Edge.EDGES:
-        if f'{ed.get_name()}' == f'{combo_box.currentText()}':
-            return ed
-        print(f'No edge found by name: {ed.get_name()}')
-
-
 def remove_edge(graphic_scene, edge, edge_combo_box):
     graphic_scene.removeItem(edge.get_line_item())
-    # sip.delete(edge.get_line_item())
+    delete_label_for_edge(edge)
+    # sip.delete(item.get_line_item())
     edge_combo_box.removeItem(edge.get_number())
     edge.delete_edge()
     edge_combo_box.clear()
@@ -73,15 +77,34 @@ def create_label_for_edge(alphabet, line, edge, graphic_scene):
     pass
 
 
+def create_label_for_state(state, graphic_scene):
+    state_name = f'Q #{state.get_number()}'
+    label = StateLabel(state_name, state)
+    label.set_graphics_scene(graphic_scene)
+    label.show_label()
+    state.set_label_item(label)
+
+
 def delete_label_for_edge(edge):
     edge.get_label_item().destroy_label()
     pass
+
+
+def delete_label_for_state(state):
+    state.get_label_item().destroy_label()
 
 
 def update_label_for_edge(edge, graphic_scene):
     delete_label_for_edge(edge)
     create_label_for_edge(edge.get_alphabet(), edge, graphic_scene)
     pass
+
+
+def update_label_for_states(graphic_scene):
+    for state in State.STATES:
+        if state:
+            delete_label_for_state(state)
+            create_label_for_state(state, graphic_scene)
 
 
 def make_final_state(state, final=True):
