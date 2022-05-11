@@ -20,7 +20,7 @@ def create_state(graphic_scene, state_combo_box):
     circle = Circle(new_state)
     graphic_scene.addItem(circle)
     new_state.connect_circle(circle)
-    state_combo_box.addItem(f'{new_state}')
+    state_combo_box.addItem(f'{new_state.get_name()}')
     create_label_for_state(new_state, graphic_scene)
 
 
@@ -37,14 +37,12 @@ def get_selected_state(combo_box):
     for state in State.STATES:
         if f'{state.get_name()}' == f'{combo_box.currentText()}':
             return state
-        print(f'No state found by name: {state.get_name()}')
 
 
 def get_selected_edge(combo_box):
     for ed in Edge.EDGES:
         if f'{ed.get_name()}' == f'{combo_box.currentText()}':
             return ed
-        print(f'No edge found by name: {ed.get_name()}')
 
 
 def remove_state(graphic_scene, state, state_combo_box):
@@ -78,7 +76,7 @@ def create_label_for_edge(alphabet, line, edge, graphic_scene):
 
 
 def create_label_for_state(state, graphic_scene):
-    state_name = f'Q #{state.get_number()}'
+    state_name = f'{state.get_name()}'
     label = StateLabel(state_name, state)
     label.set_graphics_scene(graphic_scene)
     label.show_label()
@@ -142,9 +140,6 @@ def test():
 
         nfa_states[parent][alphabet].append(child)
 
-    # print(nfa_states)
-    # print(nfa_final_states)
-
     convert_nfa_to_dfa(nfa_states, nfa_final_states)
 
 
@@ -155,8 +150,9 @@ def convert_nfa_to_dfa(nfa, nfa_final_state):
     path_list = list(Edge.ALPHABETS)
 
     dfa[keys_list[0]] = {}
-    for y in range(len(Edge.ALPHABETS) - 1):
-        var = "".join(nfa[keys_list[0]][path_list[y]])
+    for y in range(len(Edge.ALPHABETS)):
+        var = "".join(nfa[keys_list[0]][path_list[
+            y]])
         dfa[keys_list[0]][path_list[y]] = var
         if var not in keys_list:
             new_states_list.append(var)
@@ -178,6 +174,11 @@ def convert_nfa_to_dfa(nfa, nfa_final_state):
 
         new_states_list.remove(new_states_list[0])
 
+    print('NFA: ')
+    print(nfa)
+    print('NFA Final States: ')
+    print(nfa_final_state, '\n')
+
     print("\nDFA :- \n")
     print(dfa)
 
@@ -190,4 +191,4 @@ def convert_nfa_to_dfa(nfa, nfa_final_state):
                 break
 
     print("\nFinal states of the DFA are : ", dfa_final_states)
-    pass
+

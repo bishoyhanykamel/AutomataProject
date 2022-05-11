@@ -1,5 +1,6 @@
 class State:
     STATES = []
+    STATE_NAME = 'A'
 
     def __init__(self, number):
         self.number = number
@@ -8,12 +9,13 @@ class State:
         self.combobox_id = number
         self.final = False
         self.label_item = False
-        self.name = f'State #{self.number}'
+        self.name = self.STATE_NAME
+        State.STATE_NAME = chr(ord(self.STATE_NAME) + 1)
         State.STATES.append(self)
         pass
 
     def get_name(self):
-        return f'{self}'
+        return self.name
 
     def get_number(self):
         return self.number
@@ -54,7 +56,7 @@ class State:
         pass
 
     def __str__(self):
-        return f'State #{self.number}'
+        return f'State {self.name}'
 
 
 class Edge:
