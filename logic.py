@@ -59,6 +59,7 @@ class State:
 
 class Edge:
     EDGES = []
+    ALPHABETS = []
 
     def __init__(self, number, from_parent, to_parent, line_item, inp):
         self.number = number
@@ -68,6 +69,7 @@ class Edge:
         self.alphabet = inp
         self.combobox_id = number
         self.label_item = None
+        self.add_to_alphabets(inp)
         Edge.EDGES.append(self)
 
     def delete_edge(self):
@@ -104,6 +106,18 @@ class Edge:
 
     def set_label_item(self, label):
         self.label_item = label
+
+    def add_to_alphabets(self, alphabet):
+        if alphabet not in self.ALPHABETS:
+            self.ALPHABETS.append(alphabet)
+
+        try:
+            self.ALPHABETS = self.ALPHABETS.sort()
+        except:
+            print("Sorting alphabets failure")
+
+    def get_alphabets(self):
+        return self.ALPHABETS
 
     def __str__(self):
         # return f'Edge status: connected from {self.from_parent} to {self.to_parent} by {self.alphabet}'

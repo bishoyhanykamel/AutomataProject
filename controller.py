@@ -117,9 +117,77 @@ def make_final_state(state, final=True):
     pass
 
 
-def edit_state():
-    pass
+def test():
+    nfa_states = dict()
+    nfa_final_states = list()
+    for state in State.STATES:
+
+        if state.is_final():
+            nfa_final_states.append(state.get_name())
+
+        nfa_states[state.get_name()] = dict()
+        for alphabet in Edge.ALPHABETS:
+            nfa_states[state.get_name()][alphabet] = list()
+
+    for edge in Edge.EDGES:
+        parent = edge.get_parent_name()
+        child = edge.get_child_name()
+        alphabet = edge.get_alphabet()
+
+        if parent not in nfa_states.keys():
+            nfa_states[parent] = dict()
+
+        if alphabet not in nfa_states[parent].keys():
+            nfa_states[parent][alphabet] = list()
+
+        nfa_states[parent][alphabet].append(child)
+
+    # print(nfa_states)
+    # print(nfa_final_states)
+
+    convert_nfa_to_dfa(nfa_states, nfa_final_states)
 
 
-def edit_edge():
+def convert_nfa_to_dfa(nfa, nfa_final_state):
+    new_states_list = []
+    dfa = {}
+    keys_list = list(x.get_name() for x in State.STATES)
+    path_list = list(Edge.ALPHABETS)
+
+    dfa[keys_list[0]] = {}
+    for y in range(len(Edge.ALPHABETS) - 1):
+        var = "".join(nfa[keys_list[0]][path_list[y]])
+        dfa[keys_list[0]][path_list[y]] = var
+        if var not in keys_list:
+            new_states_list.append(var)
+            keys_list.append(var)
+
+    while len(new_states_list) != 0:
+        dfa[new_states_list[0]] = {}
+        for _ in range(len(new_states_list[0])):
+            for i in range(len(path_list)):
+                temp = []
+                for j in range(len(new_states_list[0])):
+                    temp += nfa[new_states_list[0][j]][path_list[i]]
+                s = ""
+                s = s.join(temp)
+                if s not in keys_list:
+                    new_states_list.append(s)
+                    keys_list.append(s)
+                dfa[new_states_list[0]][path_list[i]] = s
+
+        new_states_list.remove(new_states_list[0])
+
+    print("\nDFA :- \n")
+    print(dfa)
+
+    dfa_states_list = list(dfa.keys())
+    dfa_final_states = []
+    for x in dfa_states_list:
+        for i in x:
+            if i in nfa_final_state:
+                dfa_final_states.append(x)
+                break
+
+    print("\nFinal states of the DFA are : ", dfa_final_states)
     pass

@@ -30,9 +30,9 @@
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>10</y>
+      <y>0</y>
       <width>1031</width>
-      <height>711</height>
+      <height>751</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -258,24 +258,6 @@
      </item>
     </layout>
    </widget>
-  </widget>
-  <widget class="QMenuBar" name="menuBar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1033</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <widget class="QMenu" name="menuConvert_to_DFA">
-    <property name="title">
-     <string>Conversion</string>
-    </property>
-    <addaction name="dfaGraph_action"/>
-    <addaction name="dfaTransitionTable_action"/>
-   </widget>
-   <addaction name="menuConvert_to_DFA"/>
   </widget>
   <action name="dfaGraph_action">
    <property name="text">

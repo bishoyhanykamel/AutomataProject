@@ -192,8 +192,8 @@ class EdgeEditUI(QMainWindow):
 
 
 class MainWindowUI(QMainWindow):
-    WINDOW_WIDTH = 1025
-    WINDOW_HEIGHT = 750
+    WINDOW_WIDTH = 1031
+    WINDOW_HEIGHT = 755
 
     def __init__(self):
         super(MainWindowUI, self).__init__()
@@ -206,6 +206,7 @@ class MainWindowUI(QMainWindow):
         self.drawing_scene = drawing_scene
         self.drawing_graphicsView.setScene(drawing_scene)
         self.addState_btn.clicked.connect(lambda: create_state(drawing_scene, self.selectState_comboBox))
+        self.tupleDefinition_btn.clicked.connect(lambda: test())
         self.editState_btn.clicked.connect(self.edit_state_window)
         self.editEdge_btn.clicked.connect(self.edit_edge_window)
         self.create_edge_ui = None
