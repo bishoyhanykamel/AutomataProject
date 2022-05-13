@@ -196,7 +196,9 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
             dfa_state_dict[current_state] = dict()
             single_get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
     print(f'DFA DATA STRUCTURE: \n\t {dfa_state_dict}')
-    return dfa_state_dict
+    # return dfa_state_dict
+    # draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_combo):
+    draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene,selectState_comboBox, selectEdge_comboBox)
 
 
 # ============================================== [ DFA STATE GENERATORS ] ==============================================
@@ -248,7 +250,7 @@ def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q
 
 
 # ================================================== [ DRAWING DFA ] ==================================================
-def draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_combo):
+def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_combo):
     POSITIONS = {'A': [39.0, -12.0], 'B': [90.0, 388.0], 'C': [305.0, 72.0], 'D': [343.0, 532.0],
                  'E': [637.0, 32.0], 'F': [661.0, 428.0], 'G': [891.0, -22.0], 'H': [876.0, 308.0],
                  'I': [462.0, 171.0], 'J': [469.0, 362.0], 'K': None}
@@ -273,11 +275,17 @@ def draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_comb
         new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}')
 
         # final states
-        for x in dfa_final_states:
-            if dfa_state == x:
+        for charr in dfa_state:
+            if charr in nfa_final_states:
                 make_final_state(new_state)
-                dfa_final_states.remove(x)
                 break
+
+        # OLD CODE
+        #for x in dfa_final_states:
+        #    if dfa_state == x:
+        #        make_final_state(new_state)
+        #        dfa_final_states.remove(x)
+        #        break
 
         # pre-defined positions
         if current_pos != 'K':

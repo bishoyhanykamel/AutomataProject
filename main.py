@@ -217,10 +217,12 @@ class MainWindowUI(QMainWindow):
         self.drawing_graphicsView.setScene(drawing_scene)
         self.addState_btn.clicked.connect(lambda: create_state(drawing_scene, self.selectState_comboBox))
 
-        #self.tupleDefinition_btn.clicked.connect(
-            #lambda: dfa_nfa_converter(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
+        # old code
+        # self.tupleDefinition_btn.clicked.connect(
+        # lambda: dfa_nfa_converter(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
 
-        self.tupleDefinition_btn.clicked.connect(lambda: nfa_data_generator(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
+        self.tupleDefinition_btn.clicked.connect(
+            lambda: nfa_data_generator(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
         self.editState_btn.clicked.connect(self.edit_state_window)
         self.editEdge_btn.clicked.connect(self.edit_edge_window)
         self.create_edge_ui = None
