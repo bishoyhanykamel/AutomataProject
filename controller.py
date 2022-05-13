@@ -4,7 +4,6 @@ from PyQt5.QtGui import QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
 
-
 # project files
 from DrawingClasses import *
 from DrawingClasses import EdgeLabel
@@ -78,7 +77,6 @@ def create_label_for_edge(alphabet, line, edge, graphic_scene):
     line.set_label_item(label)
 
 
-
 def create_label_for_state(state, graphic_scene):
     state_name = f'{state.get_name()}'
     label = StateLabel(state_name, state)
@@ -91,7 +89,6 @@ def delete_label_for_edge(edge):
     edge.get_label_item().destroy_label()
 
 
-
 def delete_label_for_state(state):
     state.get_label_item().destroy_label()
 
@@ -99,7 +96,6 @@ def delete_label_for_state(state):
 def update_label_for_edge(edge, graphic_scene):
     delete_label_for_edge(edge)
     create_label_for_edge(edge.get_alphabet(), edge, graphic_scene)
-
 
 
 def update_label_for_state(graphic_scene, state):
@@ -124,8 +120,7 @@ def make_final_state(state, final=True):
         state.set_final(False)
 
 
-
-# ====================================== [ NFA DATA STRUCTURE ] =====================================================
+# =============================================== [ NFA DATA STRUCTURE ] ===============================================
 def nfa_data_generator(drawing_scene, selectState_comboBox, selectEdge_comboBox):
     nfa_states = dict()
     nfa_final_states = list()
@@ -175,8 +170,7 @@ def dfa_child_states(state, states_dict):
     return new_state_dict
 
 
-
-# ============================ [ MAIN FUNCTION OF DFA GENERATION ] =====================================================
+# ======================================== [ MAIN FUNCTION OF DFA GENERATION ] ========================================
 def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox):
     start_state = 'A'
     dfa_state_dict = dict(list())
@@ -205,8 +199,8 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
     return dfa_state_dict
 
 
-# ====================================== [ DFA STATE GENERATORS ] =====================================================
-# ======================================== [ HELPER FUNCTIONS ] =======================================================
+# ============================================== [ DFA STATE GENERATORS ] ==============================================
+# ============================== [ HELPER FUNCTIONS ] ==============================
 def get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_queue, done_states):
     state_dict = dict(list())
     for alphabet, states in states_dict[state].items():
@@ -231,7 +225,7 @@ def get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_queue, d
     dfa_states_dict[state] = state_dict
 
 
-# ======================================== [ HELPER FUNCTIONS ] =======================================================
+# ============================== [ HELPER FUNCTIONS ] ==============================
 def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q, done_states):
     for alphabet in Edge.ALPHABETS:
         set_of_states = str()
@@ -253,8 +247,7 @@ def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q
     done_states.append(state)
 
 
-
-# ====================================== [ DRAWING DFA ] =====================================================
+# ================================================== [ DRAWING DFA ] ==================================================
 def draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_combo):
     POSITIONS = {'A': [39.0, -12.0], 'B': [90.0, 388.0], 'C': [305.0, 72.0], 'D': [343.0, 532.0],
                  'E': [637.0, 32.0], 'F': [661.0, 428.0], 'G': [891.0, -22.0], 'H': [876.0, 308.0],

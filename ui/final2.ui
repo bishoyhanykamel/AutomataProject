@@ -165,7 +165,7 @@
        <item row="0" column="8" rowspan="2">
         <widget class="QPushButton" name="tupleDefinition_btn">
          <property name="text">
-          <string>Use 5-tuple definition</string>
+          <string>Convert to DFA</string>
          </property>
         </widget>
        </item>
