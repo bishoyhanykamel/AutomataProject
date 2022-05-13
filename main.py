@@ -33,6 +33,9 @@ class GraphicScene(QGraphicsScene):
                 mask.addPath(item.shape().translated(item.scenePos()))
 
     def mousePressEvent(self, event):
+        if SEMAPHORE:
+            super().mousePressEvent()
+            return
         if event.button() == Qt.LeftButton:
             item = self.control_point_at(event.scenePos())
             if item:
@@ -44,6 +47,9 @@ class GraphicScene(QGraphicsScene):
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):
+        if SEMAPHORE:
+            super().mousePressEvent()
+            return
         if self.new_connection:
             item = self.control_point_at(event.scenePos())
             if (item and item != self.start_item and
@@ -53,10 +59,14 @@ class GraphicScene(QGraphicsScene):
                 p2 = event.scenePos()
             self.new_connection.set_p2(p2)
             return
-        update_label_for_states(self)
+        else:
+            update_label_for_states(self)
         super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        if SEMAPHORE:
+            super().mousePressEvent()
+            return
         if self.new_connection:
             item = self.control_point_at(event.scenePos())
             if item and item != self.start_item:
@@ -206,7 +216,11 @@ class MainWindowUI(QMainWindow):
         self.drawing_scene = drawing_scene
         self.drawing_graphicsView.setScene(drawing_scene)
         self.addState_btn.clicked.connect(lambda: create_state(drawing_scene, self.selectState_comboBox))
-        self.tupleDefinition_btn.clicked.connect(lambda: test())
+
+        #self.tupleDefinition_btn.clicked.connect(
+            #lambda: dfa_nfa_converter(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
+
+        self.tupleDefinition_btn.clicked.connect(lambda: nfa_data_generator(drawing_scene, self.selectState_comboBox, self.selectEdge_comboBox))
         self.editState_btn.clicked.connect(self.edit_state_window)
         self.editEdge_btn.clicked.connect(self.edit_edge_window)
         self.create_edge_ui = None

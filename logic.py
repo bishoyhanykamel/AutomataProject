@@ -2,14 +2,17 @@ class State:
     STATES = []
     STATE_NAME = 'A'
 
-    def __init__(self, number):
+    def __init__(self, number, name=None):
         self.number = number
         self.edges = list()
         self.circle = None
         self.combobox_id = number
         self.final = False
         self.label_item = False
-        self.name = self.STATE_NAME
+        if name:
+            self.name = name
+        else:
+            self.name = self.STATE_NAME
         State.STATE_NAME = chr(ord(self.STATE_NAME) + 1)
         State.STATES.append(self)
         pass
@@ -112,11 +115,12 @@ class Edge:
     def add_to_alphabets(self, alphabet):
         if alphabet not in self.ALPHABETS:
             self.ALPHABETS.append(alphabet)
-
+        """
         try:
             self.ALPHABETS = self.ALPHABETS.sort()
         except:
             print("Sorting alphabets failure")
+        """
 
     def get_alphabets(self):
         return self.ALPHABETS

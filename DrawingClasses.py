@@ -1,9 +1,10 @@
 # from PyQt5 import Qt
 # drawing elements
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsItem
-from PyQt5.QtCore import QRectF, QPoint, QLineF, QVariantAnimation, Qt
+from PyQt5.QtCore import QRectF, QPoint, QLineF, QVariantAnimation, Qt, QPointF
 from PyQt5.QtGui import QPainterPath
 from controller import *
+import random
 
 
 class Circle(QGraphicsEllipseItem):
@@ -50,17 +51,33 @@ class Circle(QGraphicsEllipseItem):
         self.setPen(pen)
         pass
 
+    def get_control_points(self):
+        return self.control_points
+
+    def get_control_point(self):
+        if random.randint(0, 20) <= 10:
+            return self.control_points[0], self.control_points[0].pos()
+        else:
+            return self.control_points[1], self.control_points[1].pos()
+
 
 class Connection(QGraphicsLineItem):
     LABEL_OFFSET = 0
 
-    def __init__(self, start, p2):
+    def __init__(self, start, p2, control_point=None):
         super().__init__()
-        self.start = start
-        self.end = None
-        self._line = QLineF(start.scenePos(), p2)
-        self.p1 = start.scenePos()
-        self.p2 = p2
+        if type(control_point) is QPointF:
+            self.start = start
+            self.end = p2
+            self._line = QLineF(start.pos(), p2.pos())
+            self.p1 = start.pos()
+            self.p2 = p2.pos()
+        else:
+            self.start = start
+            self.end = None
+            self._line = QLineF(start.scenePos(), p2)
+            self.p1 = start.scenePos()
+            self.p2 = p2
         self.label_item = None
         self.setLine(self._line)
 
@@ -90,7 +107,7 @@ class Connection(QGraphicsLineItem):
 
     def set_start(self, start):
         self.start = start
-        self.update_line()
+        self.update_line(start)
 
     def set_end(self, end):
         self.end = end
