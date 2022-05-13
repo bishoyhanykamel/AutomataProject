@@ -43,7 +43,6 @@ class GraphicScene(QGraphicsScene):
                 self.new_connection = Connection(item, event.scenePos())
                 self.addItem(self.new_connection)
                 return
-
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event):

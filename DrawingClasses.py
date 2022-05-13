@@ -2,7 +2,7 @@
 # drawing elements
 from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsItem
 from PyQt5.QtCore import QRectF, QPoint, QLineF, QVariantAnimation, Qt, QPointF
-from PyQt5.QtGui import QPainterPath
+from PyQt5.QtGui import QPainterPath, QBrush, QPen
 from controller import *
 import random
 
@@ -17,7 +17,19 @@ class Circle(QGraphicsEllipseItem):
     CTRL_RIGHT_X = 45
     CTRL_RIGHT_Y = 13
 
-    def __init__(self, state):
+    CTRL_LEFTTOP_X = 0
+    CTRL_LEFTTOP_Y = -12
+
+    CTRL_RIGHTTOP_X = 30
+    CTRL_RIGHTTOP_Y = -12
+
+    CTRL_LEFTDOWN_X = 30
+    CTRL_LEFTDOWN_Y = 41
+
+    CTRL_RIGHTDOWN_X = -2
+    CTRL_RIGHTDOWN_Y = 40
+
+    def __init__(self, state, dfa=False):
         QGraphicsEllipseItem.__init__(self)
         self.state = state
         self.anim = QVariantAnimation()
@@ -25,8 +37,15 @@ class Circle(QGraphicsEllipseItem):
         self.make_not_final()
         self.setFlag(self.ItemIsMovable)
         self.control_points = []
+        self.dfa = dfa
+        self.final = False
         self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self.state)
         self.add_control_point(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self.state)
+        if dfa:
+            self.add_control_point(self.CTRL_LEFTTOP_X, self.CTRL_LEFTTOP_Y, self.state)
+            self.add_control_point(self.CTRL_RIGHTTOP_X, self.CTRL_RIGHTTOP_Y, self.state)
+            self.add_control_point(self.CTRL_LEFTDOWN_X, self.CTRL_LEFTDOWN_Y, self.state)
+            self.add_control_point(self.CTRL_RIGHTDOWN_X, self.CTRL_RIGHTDOWN_Y, self.state)
         pass
 
     def add_control_point(self, x, y, parent_state):
@@ -43,22 +62,61 @@ class Circle(QGraphicsEllipseItem):
         pen = QPen(Qt.black)
         pen.setWidth(5)
         self.setPen(pen)
+        self.final = True
         pass
 
     def make_not_final(self):
         pen = QPen(Qt.black)
         pen.setWidth(2)
         self.setPen(pen)
+        self.final = False
         pass
 
     def get_control_points(self):
         return self.control_points
 
     def get_control_point(self):
-        if random.randint(0, 20) <= 10:
-            return self.control_points[0], self.control_points[0].pos()
-        else:
-            return self.control_points[1], self.control_points[1].pos()
+        if self.dfa:
+            if len(self.control_points[0].lines) < 1:
+                return self.control_points[0], self.control_points[0].pos()
+            elif len(self.control_points[1].lines) < 1:
+                return self.control_points[1], self.control_points[1].pos()
+            elif len(self.control_points[2].lines) < 1:
+                return self.control_points[2], self.control_points[2].pos()
+            elif len(self.control_points[3].lines) < 1:
+                return self.control_points[3], self.control_points[3].pos()
+            elif len(self.control_points[4].lines) < 1:
+                return self.control_points[4], self.control_points[4].pos()
+            else:
+                return self.control_points[5], self.control_points[5].pos()
+
+    """
+    def mousePressEvent(self, event):
+        if self.dfa:
+            self.setBrush(QBrush(Qt.lightGray))
+            pen = QPen(Qt.green)
+            if self.final:
+                pen.setWidth(5)
+            else:
+                pen.setWidth(2)
+            self.setPen(pen)
+            #self.setPos(event.scenePos())
+
+    def mouseReleaseEvent(self, event):
+        if self.dfa:
+            self.setBrush(QBrush(Qt.white))
+            pen = QPen(Qt.black)
+            if self.final:
+                pen.setWidth(5)
+            else:
+                pen.setWidth(2)
+            self.setPen(pen)
+            #self.setPos(event.scenePos())
+
+    def mouseMoveEvent(self, event):
+        if event.button() == Qt.LeftButton and self.dfa:
+            self.setPos(event.scenePos())
+    """
 
 
 class Connection(QGraphicsLineItem):

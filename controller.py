@@ -3,6 +3,7 @@ from PyQt5 import sip
 from PyQt5.QtGui import QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
+import time
 
 # project files
 from DrawingClasses import *
@@ -15,11 +16,11 @@ NUM_EDGES = -1
 SEMAPHORE = False
 
 
-def create_state(graphic_scene, state_combo_box, name=None):
+def create_state(graphic_scene, state_combo_box, name=None, dfa=False):
     global NUM_STATES
     NUM_STATES = NUM_STATES + 1
     new_state = State(NUM_STATES, name)
-    circle = Circle(new_state)
+    circle = Circle(new_state, dfa)
     graphic_scene.addItem(circle)
     new_state.connect_circle(circle)
     state_combo_box.addItem(f'{new_state.get_name()}')
@@ -198,7 +199,7 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
     print(f'DFA DATA STRUCTURE: \n\t {dfa_state_dict}')
     # return dfa_state_dict
     # draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_combo):
-    draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene,selectState_comboBox, selectEdge_comboBox)
+    draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox)
 
 
 # ============================================== [ DFA STATE GENERATORS ] ==============================================
@@ -241,6 +242,9 @@ def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q
             temp_str += chr
 
         dfa_states_dict[state][alphabet] = ''.join(sorted(temp_str))
+        if len(dfa_states_dict[state][alphabet]) <= 0:
+            dfa_states_dict[state][alphabet] = 'XX'
+
         if dfa_states_dict[state][alphabet] not in dfa_state_q:
             if dfa_states_dict[state][alphabet] not in done_states:
                 dfa_state_q.append(dfa_states_dict[state][alphabet])
@@ -272,21 +276,13 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
 
     # creating DFA states
     for dfa_state in dfa_states.keys():
-        new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}')
+        new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}', dfa=True)
 
         # final states
         for charr in dfa_state:
             if charr in nfa_final_states:
                 make_final_state(new_state)
                 break
-
-        # OLD CODE
-        #for x in dfa_final_states:
-        #    if dfa_state == x:
-        #        make_final_state(new_state)
-        #        dfa_final_states.remove(x)
-        #        break
-
         # pre-defined positions
         if current_pos != 'K':
             new_state.get_circle().setX(POSITIONS[current_pos][0])
@@ -294,12 +290,13 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
             update_label_for_state(graphic_scene, new_state)
             current_pos = chr(ord(current_pos) + 1)
 
-        # what if more than the pre-defined positions?
+        # what if more than the pre-defined positions? // TODO
 
     for dfa_state in dfa_states.keys():
         # creating edges
-        # {'A': {'a': 'BA', 'b': 'A'}, 'BA': {'a': 'CBA', 'b': 'CA'}, 'CBA': {'a': 'DCBA', 'b': 'DCA'},
+        new_state = get_state(f'{dfa_state}')
         state_alphabet_dict = dfa_states[dfa_state]
+        print(f'state: {new_state} - state name: {dfa_state} - alphabet: {dfa_states[dfa_state]}')
         for alphabet in state_alphabet_dict.keys():
             for child_state in State.STATES:
                 if f'{state_alphabet_dict[alphabet]}' == child_state.get_name():
@@ -307,17 +304,30 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                     ctrl_p1, ctrl_p1_pos = new_state.get_circle().get_control_point()
                     ctrl_p2, ctrl_p2_pos = child.get_circle().get_control_point()
                     connection = Connection(ctrl_p1, ctrl_p2_pos)
-                    ctrl_p1.add_line(connection)
-                    connection.set_start(ctrl_p1)
-                    connection.set_end(ctrl_p2)
-                    ctrl_p2.add_line(connection)
                     create_edge(edge_combo, new_state, state_alphabet_dict[alphabet], connection, alphabet,
                                 graphic_scene)
+                    ctrl_p1.add_line(connection)
+                    ctrl_p2.add_line(connection)
+                    connection.set_start(ctrl_p1)
+                    connection.set_end(ctrl_p2)
                     graphic_scene.addItem(connection)
+                    print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')
                     break
+        time.sleep(1)
 
     global SEMAPHORE
     SEMAPHORE = False
+    #for edge in Edge.EDGES:
+        #edge.get_line_item().update_line()
+        #update_label_for_edge(edge, graphic_scene)
+
+
+def get_state(state_name):
+    for state in State.STATES:
+        if state.get_name() == state_name:
+            return state
+
+    print(f'Couldn"t find state {state_name}')
 
 
 # ====================================== [ OLD CODE ] =====================================================
