@@ -96,7 +96,7 @@ def delete_label_for_state(state):
 
 def update_label_for_edge(edge, graphic_scene):
     delete_label_for_edge(edge)
-    create_label_for_edge(edge.get_alphabet(), edge, graphic_scene)
+    create_label_for_edge(edge.get_alphabet(), edge.get_line_item(), edge, graphic_scene)
 
 
 def update_label_for_state(graphic_scene, state):
@@ -303,6 +303,8 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                     child = child_state
                     ctrl_p1, ctrl_p1_pos = new_state.get_circle().get_control_point()
                     ctrl_p2, ctrl_p2_pos = child.get_circle().get_control_point()
+                    if ctrl_p2 == ctrl_p1:
+                        ctrl_p2, ctrl_p2_pos = new_state.get_circle().get_diff_point(ctrl_p2)
                     connection = Connection(ctrl_p1, ctrl_p2_pos)
                     create_edge(edge_combo, new_state, state_alphabet_dict[alphabet], connection, alphabet,
                                 graphic_scene)
@@ -313,13 +315,13 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                     graphic_scene.addItem(connection)
                     print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')
                     break
-        time.sleep(1)
+
 
     global SEMAPHORE
     SEMAPHORE = False
-    #for edge in Edge.EDGES:
-        #edge.get_line_item().update_line()
-        #update_label_for_edge(edge, graphic_scene)
+    for edge in Edge.EDGES:
+        edge.get_line_item().update_line(edge.get_line_item().start)
+        update_label_for_edge(edge, graphic_scene)
 
 
 def get_state(state_name):

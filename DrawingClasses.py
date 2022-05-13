@@ -77,18 +77,25 @@ class Circle(QGraphicsEllipseItem):
 
     def get_control_point(self):
         if self.dfa:
-            if len(self.control_points[0].lines) < 1:
+            if len(self.control_points[0].lines) <= 1:
                 return self.control_points[0], self.control_points[0].pos()
-            elif len(self.control_points[1].lines) < 1:
+            elif len(self.control_points[1].lines) <= 1:
                 return self.control_points[1], self.control_points[1].pos()
-            elif len(self.control_points[2].lines) < 1:
+            elif len(self.control_points[2].lines) <= 1:
                 return self.control_points[2], self.control_points[2].pos()
-            elif len(self.control_points[3].lines) < 1:
+            elif len(self.control_points[3].lines) <= 1:
                 return self.control_points[3], self.control_points[3].pos()
-            elif len(self.control_points[4].lines) < 1:
+            elif len(self.control_points[4].lines) <= 1:
                 return self.control_points[4], self.control_points[4].pos()
             else:
                 return self.control_points[5], self.control_points[5].pos()
+
+    def get_diff_point(self, current_point):
+        for point in self.control_points:
+            if current_point == point:
+                continue
+            else:
+                return point, point.pos()
 
     """
     def mousePressEvent(self, event):
