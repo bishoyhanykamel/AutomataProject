@@ -4,6 +4,7 @@ from PyQt5.QtGui import QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
 import random
+import time
 
 # project files
 from DrawingClasses import *
@@ -178,27 +179,42 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
     dfa_state_queue = ['A']
     current_state = dfa_state_queue[0]
     done_states = []
-    get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
+    epsilon_states = []
+    # get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
 
     while len(dfa_state_queue) >= 1:
         current_state = dfa_state_queue[0]
+
+        # empty state condition
         if current_state == 'XX':
             state_dict = dict(list())
             for alphabet in Edge.ALPHABETS:
+                if alphabet == Edge.EPSILON:
+                    continue
                 state_dict[alphabet] = 'XX'
             dfa_state_queue.remove(current_state)
             done_states.append(current_state)
             dfa_state_dict[current_state] = state_dict
 
+        # single letter condition
         elif len(current_state) == 1:
-            get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
+            # if Edge.EPSILON in nfa_states[current_state].keys():
+            if Edge.EPSILON in nfa_states[current_state].keys() and len(nfa_states[current_state][Edge.EPSILON]) >= 1:
+                if current_state in epsilon_states:
+                    get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
+                else:
+                    epsilon_states.append(current_state)
+                    dfa_state_queue.remove(current_state)
+                    current_state += f'{nfa_states[current_state][Edge.EPSILON][0]}'
+                    dfa_state_queue.append(current_state)
+            else:
+                get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
 
         else:
             dfa_state_dict[current_state] = dict()
             single_get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
+
     print(f'DFA DATA STRUCTURE: \n\t {dfa_state_dict}')
-    # return dfa_state_dict
-    # draw_dfa(dfa_states, dfa_final_states, graphic_scene, state_combo, edge_combo):
     draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox)
 
 
@@ -207,6 +223,8 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
 def get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_queue, done_states):
     state_dict = dict(list())
     for alphabet, states in states_dict[state].items():
+        if alphabet == Edge.EPSILON:
+            continue
         # only 1 state
         new_state_name = ''
         if len(states) == 1:
@@ -231,6 +249,8 @@ def get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_queue, d
 # ============================== [ HELPER FUNCTIONS ] ==============================
 def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q, done_states):
     for alphabet in Edge.ALPHABETS:
+        if alphabet == Edge.EPSILON:
+            continue
         set_of_states = str()
         for single_state in state:
             set_of_states += ''.join(states_dict[single_state][alphabet])
@@ -314,8 +334,8 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                                 graphic_scene)
                     ctrl_p1.add_line(connection)
                     ctrl_p2.add_line(connection)
-                    connection.set_start(ctrl_p1)
-                    connection.set_end(ctrl_p2)
+                    connection.set_end(ctrl_p1)
+                    connection.set_start(ctrl_p2)
                     graphic_scene.addItem(connection)
                     connection.add_arrow_head()
                     print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')

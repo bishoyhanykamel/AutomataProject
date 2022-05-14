@@ -65,7 +65,7 @@ class State:
 class Edge:
     EDGES = []
     ALPHABETS = []
-
+    EPSILON = '_epsilon_'
     def __init__(self, number, from_parent, to_parent, line_item, inp):
         self.number = number
         self.from_parent = from_parent

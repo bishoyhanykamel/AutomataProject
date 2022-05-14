@@ -104,19 +104,20 @@ class EdgeCreationUI(QMainWindow):
         self.show()
 
     def save_edge(self):
-        edge_alphabet = self.inputEdge_lineEdit.text()
-        try:
-            if len(edge_alphabet) <= 0:
+        if self.epsilon_radioBtn.isChecked():
+            create_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
+                        Edge.EPSILON, window.drawing_scene)
+        else:
+            edge_alphabet = self.inputEdge_lineEdit.text()
+            try:
+                if len(edge_alphabet) <= 0:
+                    self.cancel_edge()
+                    return
+            except:
                 self.cancel_edge()
                 return
-        except:
-            self.cancel_edge()
-            return
-
-        print(f'starting control point -> {self.startItem} - parent: {self.startItem.parent_state.get_name()}')
-        print(f'ending control point -> {self.endItem} - parent: {self.endItem.parent_state.get_name()}')
-        create_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
-                    edge_alphabet, window.drawing_scene)
+            create_edge(window.selectEdge_comboBox, self.startItem.parent_state, self.endItem.parent_state, self.line,
+                        edge_alphabet, window.drawing_scene)
 
         self.close()
         pass

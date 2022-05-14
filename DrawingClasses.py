@@ -78,15 +78,15 @@ class Circle(QGraphicsEllipseItem):
 
     def get_control_point(self):
         if self.dfa:
-            if len(self.control_points[0].lines) <= 1:
+            if len(self.control_points[0].lines) < 2:
                 return self.control_points[0], self.control_points[0].pos()
-            elif len(self.control_points[1].lines) <= 1:
+            elif len(self.control_points[1].lines) < 2:
                 return self.control_points[1], self.control_points[1].pos()
-            elif len(self.control_points[2].lines) <= 1:
+            elif len(self.control_points[2].lines) < 2:
                 return self.control_points[2], self.control_points[2].pos()
-            elif len(self.control_points[3].lines) <= 1:
+            elif len(self.control_points[3].lines) < 2:
                 return self.control_points[3], self.control_points[3].pos()
-            elif len(self.control_points[4].lines) <= 1:
+            elif len(self.control_points[4].lines) < 2:
                 return self.control_points[4], self.control_points[4].pos()
             else:
                 return self.control_points[5], self.control_points[5].pos()
@@ -165,13 +165,9 @@ class Connection(QGraphicsLineItem):
     def add_arrow_head(self):
         if self.dfa:
             painter = QPainter()
-            painter.setRenderHint(QPainter.Antialiasing, True)
-
             arrow_size = 8
             pen = QPen(Qt.black)
             pen.setWidth(3)
-            painter.setPen(pen)
-            painter.setBrush(Qt.black)
 
             angle = math.atan2(-self._line.dy(), self._line.dx())
 
