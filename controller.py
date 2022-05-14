@@ -3,7 +3,7 @@ from PyQt5 import sip
 from PyQt5.QtGui import QPen
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QGraphicsItem, QGraphicsSceneMouseEvent, QGraphicsTextItem
-import time
+import random
 
 # project files
 from DrawingClasses import *
@@ -289,8 +289,12 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
             new_state.get_circle().setY(POSITIONS[current_pos][1])
             update_label_for_state(graphic_scene, new_state)
             current_pos = chr(ord(current_pos) + 1)
-
-        # what if more than the pre-defined positions? // TODO
+        else:
+            x = random.randint(100, 500)
+            y = random.randint(100, 250)
+            new_state.get_circle().setX(x)
+            new_state.get_circle().setY(y)
+            update_label_for_state(graphic_scene, new_state)
 
     for dfa_state in dfa_states.keys():
         # creating edges
@@ -305,7 +309,7 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                     ctrl_p2, ctrl_p2_pos = child.get_circle().get_control_point()
                     if ctrl_p2 == ctrl_p1:
                         ctrl_p2, ctrl_p2_pos = new_state.get_circle().get_diff_point(ctrl_p2)
-                    connection = Connection(ctrl_p1, ctrl_p2_pos)
+                    connection = Connection(ctrl_p1, ctrl_p2_pos, True, graphic_scene)
                     create_edge(edge_combo, new_state, state_alphabet_dict[alphabet], connection, alphabet,
                                 graphic_scene)
                     ctrl_p1.add_line(connection)
@@ -313,9 +317,9 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
                     connection.set_start(ctrl_p1)
                     connection.set_end(ctrl_p2)
                     graphic_scene.addItem(connection)
+                    connection.add_arrow_head()
                     print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')
                     break
-
 
     global SEMAPHORE
     SEMAPHORE = False

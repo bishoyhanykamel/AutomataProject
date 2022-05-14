@@ -1,10 +1,11 @@
 # from PyQt5 import Qt
 # drawing elements
-from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsItem
+from PyQt5.QtWidgets import QGraphicsScene, QGraphicsView, QGraphicsEllipseItem, QGraphicsLineItem, QGraphicsItem, \
+    QGraphicsPolygonItem
 from PyQt5.QtCore import QRectF, QPoint, QLineF, QVariantAnimation, Qt, QPointF
-from PyQt5.QtGui import QPainterPath, QBrush, QPen
+from PyQt5.QtGui import QPainterPath, QBrush, QPen, QPainter, QPolygonF
 from controller import *
-import random
+import math
 
 
 class Circle(QGraphicsEllipseItem):
@@ -17,17 +18,17 @@ class Circle(QGraphicsEllipseItem):
     CTRL_RIGHT_X = 45
     CTRL_RIGHT_Y = 13
 
-    CTRL_LEFTTOP_X = 0
-    CTRL_LEFTTOP_Y = -12
+    CTRL_TOP_LEFT_X = 0
+    CTRL_TOP_LEFT_Y = -12
 
-    CTRL_RIGHTTOP_X = 30
-    CTRL_RIGHTTOP_Y = -12
+    CTRL_TOP_RIGHT_X = 30
+    CTRL_TOP_RIGHT_Y = -12
 
-    CTRL_LEFTDOWN_X = 30
-    CTRL_LEFTDOWN_Y = 41
+    CTRL_BOTTOM_LEFT_X = 30
+    CTRL_BOTTOM_LEFT_Y = 41
 
-    CTRL_RIGHTDOWN_X = -2
-    CTRL_RIGHTDOWN_Y = 40
+    CTRL_BOTTOM_RIGHT_X = -2
+    CTRL_BOTTOM_RIGHT_Y = 40
 
     def __init__(self, state, dfa=False):
         QGraphicsEllipseItem.__init__(self)
@@ -42,10 +43,10 @@ class Circle(QGraphicsEllipseItem):
         self.add_control_point(self.CTRL_LEFT_X, self.CTRL_LEFT_Y, self.state)
         self.add_control_point(self.CTRL_RIGHT_X, self.CTRL_RIGHT_Y, self.state)
         if dfa:
-            self.add_control_point(self.CTRL_LEFTTOP_X, self.CTRL_LEFTTOP_Y, self.state)
-            self.add_control_point(self.CTRL_RIGHTTOP_X, self.CTRL_RIGHTTOP_Y, self.state)
-            self.add_control_point(self.CTRL_LEFTDOWN_X, self.CTRL_LEFTDOWN_Y, self.state)
-            self.add_control_point(self.CTRL_RIGHTDOWN_X, self.CTRL_RIGHTDOWN_Y, self.state)
+            self.add_control_point(self.CTRL_TOP_LEFT_X, self.CTRL_TOP_LEFT_Y, self.state)
+            self.add_control_point(self.CTRL_TOP_RIGHT_X, self.CTRL_TOP_RIGHT_Y, self.state)
+            self.add_control_point(self.CTRL_BOTTOM_LEFT_X, self.CTRL_BOTTOM_LEFT_Y, self.state)
+            self.add_control_point(self.CTRL_BOTTOM_RIGHT_X, self.CTRL_BOTTOM_RIGHT_Y, self.state)
         pass
 
     def add_control_point(self, x, y, parent_state):
@@ -97,53 +98,21 @@ class Circle(QGraphicsEllipseItem):
             else:
                 return point, point.pos()
 
-    """
-    def mousePressEvent(self, event):
-        if self.dfa:
-            self.setBrush(QBrush(Qt.lightGray))
-            pen = QPen(Qt.green)
-            if self.final:
-                pen.setWidth(5)
-            else:
-                pen.setWidth(2)
-            self.setPen(pen)
-            #self.setPos(event.scenePos())
-
-    def mouseReleaseEvent(self, event):
-        if self.dfa:
-            self.setBrush(QBrush(Qt.white))
-            pen = QPen(Qt.black)
-            if self.final:
-                pen.setWidth(5)
-            else:
-                pen.setWidth(2)
-            self.setPen(pen)
-            #self.setPos(event.scenePos())
-
-    def mouseMoveEvent(self, event):
-        if event.button() == Qt.LeftButton and self.dfa:
-            self.setPos(event.scenePos())
-    """
-
 
 class Connection(QGraphicsLineItem):
     LABEL_OFFSET = 0
 
-    def __init__(self, start, p2, control_point=None):
+    def __init__(self, start, p2, dfa=None, scene=None):
         super().__init__()
-        if type(control_point) is QPointF:
-            self.start = start
-            self.end = p2
-            self._line = QLineF(start.pos(), p2.pos())
-            self.p1 = start.pos()
-            self.p2 = p2.pos()
-        else:
-            self.start = start
-            self.end = None
-            self._line = QLineF(start.scenePos(), p2)
-            self.p1 = start.scenePos()
-            self.p2 = p2
+        self.dfa = dfa
+        self.scene = scene
+        self.start = start
+        self.end = None
+        self._line = QLineF(start.scenePos(), p2)
+        self.p1 = start.scenePos()
+        self.p2 = p2
         self.label_item = None
+        self.arrow_head = None
         self.setLine(self._line)
 
     def get_p1(self):
@@ -193,6 +162,38 @@ class Connection(QGraphicsLineItem):
             self.p2 = source.scenePos()
         self.setLine(self._line)
 
+    def add_arrow_head(self):
+        if self.dfa:
+            painter = QPainter()
+            painter.setRenderHint(QPainter.Antialiasing, True)
+
+            arrow_size = 8
+            pen = QPen(Qt.black)
+            pen.setWidth(3)
+            painter.setPen(pen)
+            painter.setBrush(Qt.black)
+
+            angle = math.atan2(-self._line.dy(), self._line.dx())
+
+            arrow_p1 = self._line.p1() + QPointF(math.sin(angle + math.pi / 3) * arrow_size,
+                                                 math.cos(angle + math.pi / 3) * arrow_size)
+
+            arrow_p2 = self._line.p1() + QPointF(math.sin(angle + math.pi - math.pi / 3) * arrow_size,
+                                                 math.cos(angle + math.pi - math.pi / 3) * arrow_size)
+
+            arrow_head = QPolygonF()
+            arrow_head.clear()
+            arrow_head << self._line.p1() << arrow_p1 << arrow_p2
+            arrow_head_item = QGraphicsPolygonItem(arrow_head)
+            arrow_head_item.setPen(pen)
+            self.arrow_head = arrow_head_item
+            self.scene.addItem(arrow_head_item)
+
+    def update_head(self):
+        if self.dfa:
+            self.scene.removeItem(self.arrow_head)
+            self.add_arrow_head()
+
 
 class ControlPoint(QGraphicsEllipseItem):
     COUNTER = 0
@@ -221,6 +222,7 @@ class ControlPoint(QGraphicsEllipseItem):
             for line in self.lines:
                 line.update_line(self)
                 line.get_label_item().update_label_position()
+                line.update_head()
             return super().itemChange(change, value)
         except Exception as e:
             print(e)
