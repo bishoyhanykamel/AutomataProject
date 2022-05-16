@@ -61,7 +61,7 @@ class Circle(QGraphicsEllipseItem):
 
     def make_final(self):
         pen = QPen(Qt.black)
-        pen.setWidth(5)
+        pen.setWidth(4)
         self.setPen(pen)
         self.final = True
         pass

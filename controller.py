@@ -215,7 +215,14 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
             single_get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
 
     print(f'DFA DATA STRUCTURE: \n\t {dfa_state_dict}')
-    draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox)
+    epsilon_states = []
+    if Edge.EPSILON in Edge.ALPHABETS:
+        for state in nfa_states.keys():
+            print(f'nfa_states[state]: {nfa_states[state][Edge.EPSILON]}')
+            if len(nfa_states[state][Edge.EPSILON]) >= 1:
+                epsilon_states.append(state)
+    print(f'epsilon_states: {epsilon_states}')
+    draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox, epsilon_states, nfa_states)
 
 
 # ============================================== [ DFA STATE GENERATORS ] ==============================================
@@ -274,12 +281,13 @@ def single_get_dfa_child_states(state, states_dict, dfa_states_dict, dfa_state_q
 
 
 # ================================================== [ DRAWING DFA ] ==================================================
-def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_combo):
+def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_combo, epsilon_states, nfa_states):
     POSITIONS = {'A': [39.0, -12.0], 'B': [90.0, 388.0], 'C': [305.0, 72.0], 'D': [343.0, 532.0],
                  'E': [637.0, 32.0], 'F': [661.0, 428.0], 'G': [891.0, -22.0], 'H': [876.0, 308.0],
                  'I': [462.0, 171.0], 'J': [469.0, 362.0], 'K': None}
 
     created_states = []
+    states_to_remove = []
     current_pos = 'A'
 
     for dfa_state in State.STATES:
@@ -296,6 +304,17 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
 
     # creating DFA states
     for dfa_state in dfa_states.keys():
+        print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
+        if dfa_state in epsilon_states:
+            states_to_remove.append(dfa_state)
+            for parent_dfa_dict in dfa_states.keys():
+                print(f'parent_dfa_dict: {parent_dfa_dict}\n')
+                for alphabet in dfa_states[parent_dfa_dict].keys():
+                    if dfa_states[parent_dfa_dict][alphabet] == dfa_state:
+                        print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}')
+                        # dfa_states[parent_dfa_dict][alphabet] = f'{dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}'
+
+            continue
         new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}', dfa=True)
 
         # final states
@@ -316,30 +335,33 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
             new_state.get_circle().setY(y)
             update_label_for_state(graphic_scene, new_state)
 
+    for state in states_to_remove:
+        dfa_states.pop(state)
     for dfa_state in dfa_states.keys():
         # creating edges
         new_state = get_state(f'{dfa_state}')
-        state_alphabet_dict = dfa_states[dfa_state]
-        print(f'state: {new_state} - state name: {dfa_state} - alphabet: {dfa_states[dfa_state]}')
-        for alphabet in state_alphabet_dict.keys():
-            for child_state in State.STATES:
-                if f'{state_alphabet_dict[alphabet]}' == child_state.get_name():
-                    child = child_state
-                    ctrl_p1, ctrl_p1_pos = new_state.get_circle().get_control_point()
-                    ctrl_p2, ctrl_p2_pos = child.get_circle().get_control_point()
-                    if ctrl_p2 == ctrl_p1:
-                        ctrl_p2, ctrl_p2_pos = new_state.get_circle().get_diff_point(ctrl_p2)
-                    connection = Connection(ctrl_p1, ctrl_p2_pos, True, graphic_scene)
-                    create_edge(edge_combo, new_state, state_alphabet_dict[alphabet], connection, alphabet,
-                                graphic_scene)
-                    ctrl_p1.add_line(connection)
-                    ctrl_p2.add_line(connection)
-                    connection.set_end(ctrl_p1)
-                    connection.set_start(ctrl_p2)
-                    graphic_scene.addItem(connection)
-                    connection.add_arrow_head()
-                    print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')
-                    break
+        if new_state:
+            state_alphabet_dict = dfa_states[dfa_state]
+            # print(f'state: {new_state} - state name: {dfa_state} - alphabet: {dfa_states[dfa_state]}')
+            for alphabet in state_alphabet_dict.keys():
+                for child_state in State.STATES:
+                    if f'{state_alphabet_dict[alphabet]}' == child_state.get_name():
+                        child = child_state
+                        ctrl_p1, ctrl_p1_pos = new_state.get_circle().get_control_point()
+                        ctrl_p2, ctrl_p2_pos = child.get_circle().get_control_point()
+                        if ctrl_p2 == ctrl_p1:
+                            ctrl_p2, ctrl_p2_pos = new_state.get_circle().get_diff_point(ctrl_p2)
+                        connection = Connection(ctrl_p1, ctrl_p2_pos, True, graphic_scene)
+                        create_edge(edge_combo, new_state, state_alphabet_dict[alphabet], connection, alphabet,
+                                    graphic_scene)
+                        ctrl_p1.add_line(connection)
+                        ctrl_p2.add_line(connection)
+                        connection.set_end(ctrl_p1)
+                        connection.set_start(ctrl_p2)
+                        graphic_scene.addItem(connection)
+                        connection.add_arrow_head()
+                        # print(f'p1: {ctrl_p1} - p2: {ctrl_p2} - p1_pos: {ctrl_p1_pos} - p2_pos: {ctrl_p2_pos}')
+                        break
 
     global SEMAPHORE
     SEMAPHORE = False
@@ -354,6 +376,7 @@ def get_state(state_name):
             return state
 
     print(f'Couldn"t find state {state_name}')
+    return None
 
 
 # ====================================== [ OLD CODE ] =====================================================
