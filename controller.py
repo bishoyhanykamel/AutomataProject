@@ -218,10 +218,10 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
     epsilon_states = []
     if Edge.EPSILON in Edge.ALPHABETS:
         for state in nfa_states.keys():
-            print(f'nfa_states[state]: {nfa_states[state][Edge.EPSILON]}')
+            # print(f'nfa_states[state]: {nfa_states[state][Edge.EPSILON]}')
             if len(nfa_states[state][Edge.EPSILON]) >= 1:
                 epsilon_states.append(state)
-    print(f'epsilon_states: {epsilon_states}')
+    # print(f'epsilon_states: {epsilon_states}')
     draw_dfa(dfa_state_dict, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox, epsilon_states, nfa_states)
 
 
@@ -304,15 +304,15 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
 
     # creating DFA states
     for dfa_state in dfa_states.keys():
-        print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
+        # print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
         if dfa_state in epsilon_states:
             states_to_remove.append(dfa_state)
             for parent_dfa_dict in dfa_states.keys():
-                print(f'parent_dfa_dict: {parent_dfa_dict}\n')
+                # print(f'parent_dfa_dict: {parent_dfa_dict}\n')
                 for alphabet in dfa_states[parent_dfa_dict].keys():
                     if dfa_states[parent_dfa_dict][alphabet] == dfa_state:
-                        print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}')
-                        # dfa_states[parent_dfa_dict][alphabet] = f'{dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}'
+                        # print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}')
+                         dfa_states[parent_dfa_dict][alphabet] = f'{dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}'
 
             continue
         new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}', dfa=True)
