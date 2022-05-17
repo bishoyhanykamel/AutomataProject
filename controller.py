@@ -304,19 +304,19 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
     graphic_scene.clear()
 
     # creating DFA states
+
+    if len(epsilon_states) >= 1:
+        for parent_dfa_dict in dfa_states.keys():
+            for alphabet in dfa_states[parent_dfa_dict].keys():
+                if dfa_states[parent_dfa_dict][alphabet] in epsilon_states:
+                    states = dfa_states[parent_dfa_dict][alphabet]
+                    states += ''.join(nfa_states[dfa_states[parent_dfa_dict][alphabet]][Edge.EPSILON])
+                    dfa_states[parent_dfa_dict][alphabet] = f'{states}'
+
     for dfa_state in dfa_states.keys():
         # print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
         if dfa_state in epsilon_states:
             states_to_remove.append(dfa_state)
-            for parent_dfa_dict in dfa_states.keys():
-                # print(f'parent_dfa_dict: {parent_dfa_dict}\n')
-                for alphabet in dfa_states[parent_dfa_dict].keys():
-                    if dfa_states[parent_dfa_dict][alphabet] == dfa_state:
-                        # print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][
-                        # Edge.EPSILON]}')
-                        states = ''.join(nfa_states[dfa_state][Edge.EPSILON])
-                        dfa_states[parent_dfa_dict][alphabet] = f'{dfa_state}{states}'
-
             continue
         new_state = create_state(graphic_scene, state_combo, name=f'{dfa_state}', dfa=True)
 
