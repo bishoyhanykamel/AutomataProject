@@ -148,8 +148,8 @@ def nfa_data_generator(drawing_scene, selectState_comboBox, selectEdge_comboBox)
 
         nfa_states[parent][alphabet].append(child)
 
-    print(f'NFA DATA STRUCTURE: \n\t {nfa_states}')
-    print(f'NFA FINAL STATES: \n\t {nfa_final_states}')
+    # print(f'NFA DATA STRUCTURE: \n\t {nfa_states}')
+    # print(f'NFA FINAL STATES: \n\t {nfa_final_states}')
     get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comboBox, selectEdge_comboBox)
 
 
@@ -214,7 +214,7 @@ def get_dfa_states(nfa_states, nfa_final_states, drawing_scene, selectState_comb
             dfa_state_dict[current_state] = dict()
             single_get_dfa_child_states(current_state, nfa_states, dfa_state_dict, dfa_state_queue, done_states)
 
-    print(f'DFA DATA STRUCTURE: \n\t {dfa_state_dict}')
+
     epsilon_states = []
     if Edge.EPSILON in Edge.ALPHABETS:
         for state in nfa_states.keys():
@@ -305,14 +305,15 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
 
     # creating DFA states
     for dfa_state in dfa_states.keys():
-        print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
+        # print(f'dfa_state: {dfa_state} - epsilon_states: {epsilon_states}')
         if dfa_state in epsilon_states:
             states_to_remove.append(dfa_state)
             for parent_dfa_dict in dfa_states.keys():
-                print(f'parent_dfa_dict: {parent_dfa_dict}\n')
+                # print(f'parent_dfa_dict: {parent_dfa_dict}\n')
                 for alphabet in dfa_states[parent_dfa_dict].keys():
                     if dfa_states[parent_dfa_dict][alphabet] == dfa_state:
-                        print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][Edge.EPSILON]}')
+                        # print(f'{dfa_states[parent_dfa_dict][alphabet]} - {dfa_state}{nfa_states[dfa_state][
+                        # Edge.EPSILON]}')
                         states = ''.join(nfa_states[dfa_state][Edge.EPSILON])
                         dfa_states[parent_dfa_dict][alphabet] = f'{dfa_state}{states}'
 
@@ -371,13 +372,17 @@ def draw_dfa(dfa_states, nfa_final_states, graphic_scene, state_combo, edge_comb
         edge.get_line_item().update_line(edge.get_line_item().start)
         update_label_for_edge(edge, graphic_scene)
 
+    print(f'\tNFA DATA STRUCTURE: \n\t{nfa_states}\n')
+    print(f'\tNFA FINAL STATES: \n\t{nfa_final_states}\n')
+    print(f'\tDFA DATA STRUCTURE: \n\t{dfa_states}\n')
+
 
 def get_state(state_name):
     for state in State.STATES:
         if state.get_name() == state_name:
             return state
 
-    print(f'Couldn"t find state {state_name}')
+    print(f'Couldn\'t find state {state_name}')
     return None
 
 
